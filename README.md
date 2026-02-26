@@ -1,32 +1,32 @@
-# PHI-HCL: Protein-Metabolite Interaction via HyperCL
+# PMPIHGLL: A deep learning model for predicting metabolite-protein interaction
 
-PHI-HCL is a comprehensive toolkit and dataset collection for studying protein-metabolite interactions using hypergraph-based deep learning. It is designed for researchers in bioinformatics, computational biology, and drug discovery.
+PMPIHGLL is a comprehensive toolkit and dataset collection for studying protein-metabolite interactions using hypergraph-based deep learning. It is designed for researchers in bioinformatics, computational biology, and drug discovery.
 
 ## Model Architecture Overview
 ### The proposed framework consists of three main stages: (A) Raw Feature Extraction, (B) Feature Improvement, and (C) Prediction.
-![Model Architecture](https://github.com/ztjin958/PMI-HCL/blob/main/Figure%201_01.png)
+![Model Architecture](https://github.com/ztjin958/PMPIHGLL/blob/main/Figure%201_01.png)
 #### (A) Raw Feature Extraction
 In the initial stage, raw biological data is transformed into high-dimensional feature representations:
-- Metabolites: SMILES strings are processed using ChemGPT to generate the initial metabolite feature matrix ($FM$).
-- Proteins: Amino acid sequences are encoded using ProtT5 to generate the initial protein feature matrix ($FP$).
+- Metabolites: SMILES strings are processed using ChemGPT to generate raw metabolite feature matrix (FM).
+- Proteins: Amino acid sequences are encoded using ProtT5 to generate raw protein feature matrix (FP).
 #### (B) Feature Improvement
-This stage enhances the raw features by integrating relational knowledge and fine-tuning representations through multi-scale analysis:
+This stage enhances the raw features via HyperConv, channel-wise attention mechanism and 1D-convolutional neural network:
 - Graph-based Knowledge Integration:
-	* Structural information from STITCH (for metabolites) and STRING (for proteins) is utilized.K-Nearest Neighbors (KNN) is applied to construct hypergraphs ($HG_m$ and $HG_p$) at different scales($K_1, K_2$).
+	* Chemical-chemical interaction and protein-protein interaction information is retrieved from from STITCH and STRING, respectively. K-Nearest Neighbors (KNN) algorithm is applied to construct hypergraphs (HGm and HGp) using different K values (Km1,Km2 for HGm and (Kp1,Kp2 for HGp).
 - Hypergraph Convolution & Contrastive Learning:
-	* Dual HyperConv layers extract complex higher-order correlations.Contrastive Learning is employed between different scales to ensure robust and invariant feature learning.
+	* Dual HyperConv extracts complex high-level features of metabolites and proteins. Contrastive learning is further employed to enhance the quality of high-level features.
 - Channel-wise Attention Mechanism:
-	* Features from different scales ($\widetilde{FM}$, $\widetilde{FP}$) undergo Row Average Pooling followed by a Fully Connected Neural Network.
-	* The model dynamically re-weights feature channels to highlight the most informative biological signals, resulting in refined features($\ddot{FM}$ and $\ddot{FP}$).
-	* Finally, 1-D Convolutional Neural Networks (1-D CNN) are used to reduce dimensionality and consolidate the enhanced features ($\widehat{FM}$ and $\widehat{FP}$).
+	* Features from different HyperConv (FM~, FP~) undergo row average pooling followed by a fully connected neural network for obtaining attention weights.
+	* The features are refined by the attention weights and convolution operator (FM¨ and FP¨).
+	* 1-D Convolutional Neural Networks (1-D CNN) are used to fuse two metabolite and protein features (FM^ and FP^).
 #### (C) Prediction
 The final stage performs the interaction inference:
-- Feature Fusion: The raw features ($FM, FP$) and the improved features ($\widehat{FM}, \widehat{FP}$) are integrated to form the final comprehensive representations.
-- Interaction Scoring: The fused features for both metabolites and proteins are fed into a Fully Connected Layer (Multi-layer Perceptron) to predict the probability of interaction.
+- Feature Fusion: The raw features (FM, FP) and the improved features (FM^,FP^) are integrated to form the final comprehensive representations.
+- Interaction Scoring: The fused features for both metabolites and proteins are fed into a fully connected layer to predict the probability of interaction.
 
 ## Background
 
-Understanding protein-metabolite interactions is crucial for elucidating biological processes and drug mechanisms. This project provides curated datasets and PyTorch-based code for building, training, and evaluating hypergraph neural network models on multiple species.
+Understanding metabolite-protein interactions is crucial for elucidating biological processes and drug mechanisms. This project provides curated datasets and PyTorch-based code for building, training, and evaluating a deep learning model.
 
 ## Features
 
@@ -61,17 +61,17 @@ requirements.txt  # Python dependencies
 
 ## Model & Code Overview
 
-- `Model.py`: Implements a hypergraph neural network (HGNN) for learning on protein/metabolite graphs
-- `Prepare.py`: Loads and processes raw data, builds graph structures, generates features
-- `main.py`: Orchestrates training, cross-validation, and evaluation; supports GPU/CPU
+- `Model.py`: Implement a hypergraph neural network (HGNN) for learning on protein/metabolite graphs
+- `Prepare.py`: Load and processe raw data, build graph structures, generate features
+- `main.py`: Orchestrate training, cross-validation, and evaluation; support GPU/CPU
 - `utils.py`: Helper functions for matrix conversion, metrics, and data handling
 
 ## Installation & Usage
 
 1. Clone the repository:
 	```bash
-	git clone https://github.com/ztjin958/PMI-HCL.git
-	cd PMI-HCL
+	git clone https://github.com/ztjin958/PMPIHGLL.git
+	cd PMPIHGLL
 	```
 2. Install dependencies:
 	```bash
@@ -91,7 +91,7 @@ requirements.txt  # Python dependencies
 ## Citation & Contribution
 
 If you use this project, please cite:
-https://github.com/ztjin958/PMI-HCL
+https://github.com/ztjin958/PMPIHGLL
 
 Contributions, issues, and pull requests are welcome!
 
