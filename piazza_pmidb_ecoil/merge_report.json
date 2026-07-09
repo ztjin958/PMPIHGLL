@@ -1,0 +1,60 @@
+{
+  "output_dir": "E:\\JZT_XIAOLUNWEN\\piazza_pmidb_ecoil",
+  "m_p_links": {
+    "pmidb_rows": 34186,
+    "piazza_rows": 17352,
+    "duplicate_keys": 13262,
+    "merged_rows": 38276,
+    "only_pmidb": 20924,
+    "only_piazza": 4090,
+    "both_sources": 13262
+  },
+  "m_m_links": {
+    "duplicate_keys": 369,
+    "merged_rows": 141,
+    "pmidb_tsv_rows": 282,
+    "piazza_tsv_rows": 228,
+    "after_filter_to_pmi_metas": 141,
+    "pmi_meta_count": 20
+  },
+  "p_p_links": {
+    "duplicate_keys": 398545,
+    "merged_rows": 270777,
+    "pmidb_tsv_rows": 541554,
+    "piazza_tsv_rows": 127768,
+    "after_filter_to_pmi_proteins": 270777,
+    "pmi_protein_count": 2525
+  },
+  "meta_smi": {
+    "unique_cids": 20,
+    "source_pmidb_only": 2,
+    "source_piazza_only": 0,
+    "source_both": 18,
+    "lines_in_pmi_metas": 20
+  },
+  "matched_protein_sequences": {
+    "unique_proteins": 2525,
+    "in_pmi_proteins": 2525
+  },
+  "embeddings": {
+    "meta": {
+      "shape": [
+        20,
+        256
+      ],
+      "from_pmidb": 20,
+      "from_piazza": 0,
+      "random_fallback": 0
+    },
+    "protein": {
+      "shape": [
+        2525,
+        1024
+      ],
+      "from_pmidb": 2525,
+      "from_piazza": 0,
+      "random_fallback": 0
+    },
+    "skipped": false
+  }
+}

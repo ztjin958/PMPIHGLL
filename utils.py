@@ -21,8 +21,10 @@ def edgelist_to_matrix(l,file_path):
 
     # 填充矩阵
     for _, row in df.iterrows():
-        i, j, w = row['node1'], row['node2'], row['weight']
-        matrix[i][j] = w/1000
+        i, j, w = int(row['node1']), int(row['node2']), row['weight']
+        if i < 0 or j < 0 or i >= l or j >= l:
+            continue
+        matrix[i][j] = w / 1000
         # 如果是无向图，取消下面一行的注释
         matrix[j][i] = w/1000
     np.fill_diagonal(matrix,val=1)
@@ -60,6 +62,64 @@ def convert_adjacency_matrix(adj_matrix):
         result_matrix = torch.tensor([rows, cols], dtype=torch.int64, device=device)
         list.append(result_matrix)
     return list
+
+
+def convert_hypergraph_to_pyg(H_list, eps=1e-8, device=None):
+    """
+    将 N×M 加权超图关联矩阵列表转为 PyG 格式（H5：支持 is_probH 等非零权）。
+
+    返回:
+        hyperedge_index_list: 每个元素 shape [2, num_incidences]
+        incidence_weight_list: 每条关联 (node, hyperedge) 的权重，shape [num_incidences]
+        hyperedge_weight_list: 每条超边标量权（列非零权均值），shape [num_hyperedges]
+    """
+    if device is None:
+        device = globals().get("device", "cpu")
+
+    hyperedge_index_list = []
+    incidence_weight_list = []
+    hyperedge_weight_list = []
+
+    for H in H_list:
+        if isinstance(H, np.ndarray):
+            H_t = torch.from_numpy(H.astype(np.float32))
+        elif isinstance(H, torch.Tensor):
+            H_t = H.float()
+        else:
+            raise ValueError("H 必须是 numpy 或 torch 张量")
+        H_t = H_t.to(device)
+        n_nodes, n_edges = H_t.shape
+
+        rows, cols, vals = [], [], []
+        col_means = torch.zeros(n_edges, dtype=torch.float32, device=device)
+
+        for col in range(n_edges):
+            col_vec = H_t[:, col]
+            nz_mask = col_vec > eps
+            if not nz_mask.any():
+                continue
+            nz_idx = torch.where(nz_mask)[0]
+            nz_val = col_vec[nz_idx]
+            col_means[col] = nz_val.mean()
+            for r, v in zip(nz_idx.tolist(), nz_val.tolist()):
+                rows.append(r)
+                cols.append(col)
+                vals.append(v)
+
+        if len(rows) == 0:
+            hyperedge_index = torch.zeros((2, 0), dtype=torch.long, device=device)
+            incidence_weight = torch.zeros(0, dtype=torch.float32, device=device)
+            hyperedge_weight = torch.zeros(n_edges, dtype=torch.float32, device=device)
+        else:
+            hyperedge_index = torch.tensor([rows, cols], dtype=torch.long, device=device)
+            incidence_weight = torch.tensor(vals, dtype=torch.float32, device=device)
+            hyperedge_weight = col_means
+
+        hyperedge_index_list.append(hyperedge_index)
+        incidence_weight_list.append(incidence_weight)
+        hyperedge_weight_list.append(hyperedge_weight)
+
+    return hyperedge_index_list, incidence_weight_list, hyperedge_weight_list
 
 
 def compute_distance_matrix(X, metric='cosine', p=3):
@@ -350,23 +410,59 @@ def load_edge_index(file_path, sample_size=None):
 
 
 
-def process_data(arr,r,fold):
-    data = np.array(arr)
-    # 将数据分为10组，每组5个
-    groups = np.array(data).reshape(r, fold)
+def process_data(arr, r, fold):
+    """
+    R 轮 RUS × fold 折指标汇总。
+    - R>1：每轮 RUS 先对 fold 折求均值，再对 R 个均值求 mean±std（与 main.py 一致）。
+    - R=1：对 fold 折直接 mean±std（不能对 1 个 RUS 均值用 ddof=1，否则 std=nan）。
+    """
+    data = np.asarray(arr, dtype=float)
+    expected = r * fold
+    if data.size != expected:
+        raise ValueError(
+            f"process_data: 需要 {expected} 个分数 (R={r}, fold={fold})，当前 {data.size}"
+        )
 
-    # 计算每组的平均值
-    group_means = np.mean(groups, axis=1)
+    if r == 1:
+        final_mean = float(np.mean(data))
+        final_std = float(np.std(data, ddof=1)) if fold > 1 else 0.0
+    else:
+        groups = data.reshape(r, fold)
+        group_means = np.mean(groups, axis=1)
+        final_mean = float(np.mean(group_means))
+        final_std = float(np.std(group_means, ddof=1)) if r > 1 else 0.0
 
-    # 计算10个平均值的总体平均值
-    final_mean = np.mean(group_means)
+    return f"{final_mean:.5f} ± {final_std:.3f}"
 
-    # 计算10个平均值的标准差
-    final_std = np.std(group_means, ddof=1)  # 使用样本标准差
 
-    # 格式化输出结果
-    result = f"{final_mean:.5f} ± {final_std:.3f}"
+def summarize_rus_cv_metrics(scores, R: int, n_splits: int) -> dict:
+    """
+    与 process_data / main.py 一致：
+    R>1：每轮 RUS 的 fold 均值 → 对 R 轮求 mean±std；
+    R=1：在 n_splits 折上直接 mean±std（勿对单个 RUS 均值用 ddof=1）。
+    """
+    data = np.asarray(scores, dtype=float)
+    formatted = process_data(scores, R, n_splits)
+    parts = formatted.split("±")
+    final_mean = float(parts[0].strip())
+    final_std = float(parts[1].strip())
 
-    return result
+    out: dict = {
+        "R": R,
+        "n_splits": n_splits,
+        "n_scores": int(data.size),
+        "mean": final_mean,
+        "std": final_std,
+        "formatted": formatted,
+        "per_fold_scores": [float(x) for x in data],
+    }
+    if R == 1:
+        out["aggregation"] = "mean_std_over_folds"
+        out["per_rus_fold_means"] = None
+    else:
+        out["aggregation"] = "mean_std_over_rus_means"
+        groups = data.reshape(R, n_splits)
+        out["per_rus_fold_means"] = [float(x) for x in np.mean(groups, axis=1)]
+    return out
 
 

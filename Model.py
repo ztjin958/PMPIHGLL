@@ -177,7 +177,10 @@ class Model(torch.nn.Module):
         results_rows = []
         for i in range(len(index[0])):
             results_rows.append(torch.concat((protein[:,:,index[0][i],:],meta[:,:,index[1][i],:]),dim=2))
-        x = torch.stack(results_rows,dim=2).to(device).squeeze()
+        x = torch.stack(results_rows, dim=2).to(device).squeeze()
+        # 单条 MPI 时 squeeze 会去掉 batch 维，BatchNorm1d 需要 [N, C]
+        if x.dim() == 1:
+            x = x.unsqueeze(0)
         x = self.encoder(x)
 
-        return x,loss
+        return x, loss

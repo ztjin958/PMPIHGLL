@@ -1,0 +1,23 @@
+C00002	HMDB00538	Adenosine 5'-triphosphate	https://www.genome.jp/dbget-bin/www_bget?C00002	NC1=NC=NC2=C1N=CN2[C@@H]1O[C@H](COP(O)(=O)OP(O)(=O)OP(O)(O)=O)[C@@H](O)[C@H]1O
+C00003	HMDB00902	Nicotinamide adenine dinucleotide	https://www.genome.jp/dbget-bin/www_bget?C00003	NC(=O)C1=C[N+](=CC=C1)[C@@H]1O[C@H](COP([O-])(=O)OP(O)(=O)OC[C@H]2O[C@H]([C@H](O)[C@@H]2O)N2C=NC3=C2N=CN=C3N)[C@@H](O)[C@H]1O
+C00006	HMDB00217	Nicotinamide adenine dinucleotide phosphate	https://www.genome.jp/dbget-bin/www_bget?C00006	NC(=O)C1=C[N+](=CC=C1)[C@@H]1O[C@H](COP([O-])(=O)OP(O)(=O)OC[C@H]2O[C@H]([C@H](OP(O)(O)=O)[C@@H]2O)N2C=NC3=C2N=CN=C3N)[C@@H](O)[C@H]1O
+C00008	HMDB01341	Adenosine 5'-diphosphate	https://www.genome.jp/dbget-bin/www_bget?C00008	NC1=NC=NC2=C1N=CN2[C@@H]1O[C@H](COP(O)(=O)OP(O)(O)=O)[C@@H](O)[C@H]1O
+C00022	HMDB00243	Pyruvic acid	https://www.genome.jp/dbget-bin/www_bget?C00022	CC(=O)C(O)=O
+C00025	HMDB00148	L-Glutamic acid	https://www.genome.jp/dbget-bin/www_bget?C00025	N[C@@H](CCC(O)=O)C(O)=O
+C00026	HMDB00208	Oxoglutaric acid	https://www.genome.jp/dbget-bin/www_bget?C00026	OC(=O)CCC(=O)C(O)=O
+C00044	HMDB01273	Guanosine 5'-triphosphate	https://www.genome.jp/dbget-bin/www_bget?C00044	NC1=NC2=C(N=CN2[C@@H]2O[C@H](COP(O)(=O)OP(O)(=O)OP(O)(O)=O)[C@@H](O)[C@H]2O)C(=O)N1
+C00073	HMDB00696	L-Methionine	https://www.genome.jp/dbget-bin/www_bget?C00073	CSCC[C@H](N)C(O)=O
+C00074	HMDB00263	Phosphoenolpyruvic acid	https://www.genome.jp/dbget-bin/www_bget?C00074	OC(=O)C(=C)OP(O)(O)=O
+C00079	HMDB00159	L-Phenylalanine	https://www.genome.jp/dbget-bin/www_bget?C00079	N[C@@H](CC1=CC=CC=C1)C(O)=O
+C00092	HMDB01401	D-Glucose 6-phosphate	https://www.genome.jp/dbget-bin/www_bget?C00092	OC1O[C@H](COP(O)(O)=O)[C@@H](O)[C@H](O)[C@H]1O
+C00117	HMDB00618	D-Ribose 5-phosphate	https://www.genome.jp/dbget-bin/www_bget?C00117	OCC(=O)[C@H](O)[C@H](O)COP(O)(O)=O
+C00144	HMDB01397	Guanosine monophosphate	https://www.genome.jp/dbget-bin/www_bget?C00144	NC1=NC2=C(N=CN2[C@@H]2O[C@H](COP(O)(O)=O)[C@@H](O)[C@H]2O)C(=O)N1
+C00149	HMDB00156	L-Apple acid	https://www.genome.jp/dbget-bin/www_bget?C00149	O[C@@H](CC(O)=O)C(O)=O
+C00158	HMDB00094	Citric acid	https://www.genome.jp/dbget-bin/www_bget?C00158	OC(=O)CC(O)(CC(O)=O)C(O)=O
+C00183	HMDB00883	L-Valine	https://www.genome.jp/dbget-bin/www_bget?C00183	CC(C)[C@H](N)C(O)=O
+C00345	HMDB01316	6-Phospho-D-gluconate	https://www.genome.jp/dbget-bin/www_bget?C00345	O[C@H](COP(O)(O)=O)[C@@H](O)[C@H](O)[C@@H](O)C(O)=O
+C00354	HMDB01058	D-Fructose 1	https://www.genome.jp/dbget-bin/www_bget?C00354	O[C@H]1[C@H](O)[C@@](O)(COP(O)(O)=O)O[C@@H]1COP(O)(O)=O
+C00575	HMDB00058	Cyclic adenylic acid	https://www.genome.jp/dbget-bin/www_bget?C00575	[H][C@@]12COP(O)(=O)O[C@@]1([H])[C@@H](O)[C@@H](O2)N1C=NC2=C1N=CN=C2N
+C10025	HMDB41832	Baicalin	https://www.genome.jp/dbget-bin/www_bget?C10025	O[C@@H]1[C@@H](O)[C@@H](OC2=C(O)C(O)=C3C(=O)C=C(OC3=C2)C2=CC=CC=C2)O[C@@H]([C@H]1O)C(O)=O
+C00187	HMDB00067	Cholesterol	https://www.genome.jp/dbget-bin/www_bget?C00187	[H][C@@]1(CC[C@@]2([H])[C@]3([H])CC=C4C[C@@H](O)CC[C@]4(C)[C@@]3([H])CC[C@]12C)[C@H](C)CCCC(C)C
+C01356	/	Lipid	https://www.genome.jp/dbget-bin/www_bget?C01356	NA
