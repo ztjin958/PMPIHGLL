@@ -34,20 +34,29 @@ Understanding metabolite-protein interactions is crucial for elucidating biologi
 - Hypergraph neural network (HGNN) model implementation (PyTorch & torch-geometric)
 - Data preprocessing and feature extraction scripts
 - Reproducible training and evaluation pipeline
-- Large file support (split for GitHub compatibility)
+- **Local node-level 5-fold CV** (`main_local_cv.py`) for within-dataset evaluation
+- **Transductive cross-source train/test** (e.g. Piazza train → PMIDB/ecoil test)
+- Large file support (split for GitHub compatibility; Git LFS for embeddings)
 
 ## Directory Structure
 
 ```
-piazza/           # E. coli dataset
-PMIDB/human/      # Human protein-metabolite interaction data
-stitch_ecoli/     # E. coli dataset
-stitch_yeast/     # Yeast dataset
-Model.py          # Model definition (HGNN)
-Prepare.py        # Data preprocessing and feature generation
-main.py           # Main training & evaluation script
-utils.py          # Utility functions (metrics, matrix conversion, etc.)
-requirements.txt  # Python dependencies
+piazza/                    # Piazza E. coli PMI & features
+PMIDB/human/               # Human protein-metabolite interaction data
+PMIDB/ecoil/               # PMIDB E. coli PMI & features
+piazza_pmidb_ecoil/        # Merged features (piazza + PMIDB/ecoil); see merge script
+stitch_ecoli/              # STITCH E. coli (400 / 700 PMI subsets)
+stitch_yeast/              # STITCH yeast (400 / 700 PMI subsets)
+Model.py                   # Model definition (HGNN)
+Prepare.py                 # Legacy data preprocessing
+prepare_core.py            # Unified prepare for local CV / main_core
+datasets_processed.py      # Dataset paths & links configuration
+main.py                    # Main training & evaluation script
+main_local_cv.py           # Local 5-fold CV (protein or meta split)
+main_stitch_train_piazza_test.py  # Transductive train/test (stitch-piazza | piazza-pmidb)
+merge_piazza_pmidb_ecoil.py       # Build piazza_pmidb_ecoil/ merged directory
+utils.py                   # Utility functions (metrics, matrix conversion, etc.)
+requirements.txt           # Python dependencies
 ```
 
 ## Dataset Details
@@ -77,11 +86,55 @@ requirements.txt  # Python dependencies
 	```bash
 	pip install -r requirements.txt
 	```
-3. Prepare data (if needed, see Prepare.py for details)
-4. Run the main script:
+3. Prepare data (if needed, see `Prepare.py` / `prepare_core.py` for details)
+4. Run the main script (standard edge-level CV):
 	```bash
 	python main.py
 	```
+
+### Local node-level 5-fold CV (`local_cv`)
+
+Within a single dataset, hold out **protein nodes** or **metabolite nodes** for testing (5 folds × R RUS rounds; default R=10, PMIDB human uses R=1).
+
+Supported datasets: `stitch_ecoli_400`, `stitch_ecoli_700`, `stitch_yeast_400`, `stitch_yeast_700`, `piazza`, `pmidb_human`.
+
+```bash
+# Generic entry
+python main_local_cv.py --dataset piazza --split protein
+python main_local_cv.py --dataset stitch_ecoli_400 --split meta
+
+# Per-dataset shortcuts (equivalent)
+python main_local_piazza_protein.py
+python main_local_stitch_ecoli_400_meta.py
+```
+
+Outputs are written under `model_{dataset}_local_{protein|meta}/`.
+
+Processed PMI variants (`*_processed.csv`) and per-dataset READMEs are provided under each data directory.
+
+### Transductive Piazza train → PMIDB/ecoil test (`piazza_pmidb_ecoil`)
+
+Cross-source evaluation: train on Piazza PMI, test on PMIDB/ecoil PMI. The graph uses the **union of nodes** from `piazza_pmidb_ecoil/` (merged m_m / p_p hyperedges and embeddings).
+
+**Step 1 — merge data** (run once, or after updating source PMI):
+
+```bash
+python merge_piazza_pmidb_ecoil.py
+```
+
+This reads `piazza/` and `PMIDB/ecoil/` and writes `piazza_pmidb_ecoil/`.
+
+**Step 2 — train & test**:
+
+```bash
+python main_stitch_train_piazza_test.py --mode piazza-pmidb
+```
+
+Optional flags: `--processed` (use `*_processed.csv`), `--no-rus`, `--drop-test-only-proteins FRAC`.
+
+Output directory: `model_stitch_train_piazza_test_piazza_train_pmidb_test/`.
+
+On Windows, if OpenMP conflicts occur: `set KMP_DUPLICATE_LIB_OK=TRUE` before running.
 
 ## Requirements
 
